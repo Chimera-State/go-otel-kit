@@ -3,6 +3,7 @@ networks:
     driver: bridge
 
 services:
+
   jaeger:
     image: jaegertracing/all-in-one:1.57
     container_name: jaeger
@@ -12,6 +13,7 @@ services:
       - "16686:16686"
       - "14250:14250"
       - "14268:14268"
+      - "4317:4317"
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     restart: unless-stopped
@@ -22,7 +24,6 @@ services:
     networks:
       - observability
     ports:
-      - "4317:4317"
       - "4318:4318"
       - "8888:8888"
     volumes:
@@ -50,26 +51,6 @@ services:
       - jaeger
     restart: unless-stopped
 
-  redis:
-    image: redis:7-alpine
-    networks:
-      - observability
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-
-  postgres:
-    image: postgres:16-alpine
-    networks:
-      - observability
-    environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
-      POSTGRES_DB: testdb
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
-
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
@@ -91,4 +72,26 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    networks:
+      - observability
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    networks:
+      - observability
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: testdb
     restart: unless-stopped

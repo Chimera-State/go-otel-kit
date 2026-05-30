@@ -1,33 +1,25 @@
 {
-  "__inputs": [],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "10.0.0"
-    },
-    {
-      "type": "datasource",
-      "id": "jaeger",
-      "name": "Jaeger",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "traces",
-      "name": "Traces",
-      "version": ""
-    }
-  ],
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "description": "Trace ID ile arama, span detayları ve hata filtreleme.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -36,10 +28,6 @@
         "uid": "jaeger-datasource"
       },
       "description": "Trace ID ile arama veya servis + operasyon bazlı filtreleme. Span detaylarını görmek için trace'e tıkla.",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "gridPos": {
         "h": 22,
         "w": 24,
@@ -57,33 +45,42 @@
         "sortOrder": "Descending",
         "wrapLogMessage": false
       },
-      "title": "Trace Explorer",
-      "type": "traces",
       "targets": [
         {
           "datasource": {
             "type": "jaeger",
             "uid": "jaeger-datasource"
           },
+          "limit": 20,
+          "maxDuration": "",
+          "minDuration": "$min_duration",
+          "operation": "$operation",
           "queryType": "search",
           "refId": "A",
           "service": "$service",
-          "operation": "$operation",
-          "tags": "$tags",
-          "minDuration": "$min_duration",
-          "maxDuration": "",
-          "limit": 20
+          "tags": "$tags"
         }
-      ]
+      ],
+      "title": "Trace Explorer",
+      "type": "traces"
     }
   ],
   "refresh": "30s",
-  "schemaVersion": 38,
-  "tags": ["otel", "tracing", "trace-explorer"],
+  "schemaVersion": 39,
+  "tags": [
+    "otel",
+    "tracing",
+    "trace-explorer"
+  ],
   "templating": {
     "list": [
       {
-        "current": {},
+        "allValue": "",
+        "current": {
+          "selected": false,
+          "text": "example-http-service",
+          "value": "example-http-service"
+        },
         "datasource": {
           "type": "jaeger",
           "uid": "jaeger-datasource"
@@ -91,22 +88,45 @@
         "definition": "",
         "hide": 0,
         "includeAll": true,
-        "allValue": "",
         "label": "Service",
         "multi": false,
         "name": "service",
-        "options": [],
-        "query": {
-          "queryType": "services",
-          "refId": "StandardVariableQuery"
-        },
+        "options": [
+          {
+            "selected": false,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": true,
+            "text": "example-http-service",
+            "value": "example-http-service"
+          },
+          {
+            "selected": false,
+            "text": "example-grpc-server",
+            "value": "example-grpc-server"
+          },
+          {
+            "selected": false,
+            "text": "example-grpc-client",
+            "value": "example-grpc-client"
+          }
+        ],
+        "query": "example-http-service,example-grpc-server,example-grpc-client",
         "refresh": 2,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
-        "type": "query"
+        "type": "custom"
       },
       {
-        "current": {},
+        "allValue": "",
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "jaeger",
           "uid": "jaeger-datasource"
@@ -114,20 +134,27 @@
         "definition": "",
         "hide": 0,
         "includeAll": true,
-        "allValue": "",
         "label": "Operation",
         "multi": false,
         "name": "operation",
-        "options": [],
-        "query": {
-          "queryType": "operations",
-          "refId": "StandardVariableQuery",
-          "service": "$service"
-        },
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "*",
+            "value": "*"
+          }
+        ],
+        "query": "*",
         "refresh": 2,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
-        "type": "query"
+        "type": "custom"
       },
       {
         "current": {
@@ -169,5 +196,6 @@
   "timezone": "browser",
   "title": "Trace Explorer",
   "uid": "trace-explorer-dashboard",
-  "version": 1
+  "version": 1,
+  "weekStart": ""
 }
