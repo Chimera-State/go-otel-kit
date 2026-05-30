@@ -27,7 +27,7 @@ func (mc metadataCarrier) Set(key string, value string) {
 
 func (mc metadataCarrier) Keys() []string {
 	keys := make([]string, 0, len(mc))
-	for k := range mc {
+	for k := range metadata.MD(mc) {
 		keys = append(keys, k)
 	}
 	return keys
