@@ -12,7 +12,7 @@ dist/
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw?f
 
 vendor/
 
