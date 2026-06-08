@@ -2,103 +2,45 @@
 
 # go-otel-kit
 
-Go uygulamaları için OpenTelemetry tabanlı distributed tracing araç kiti.  
-HTTP, gRPC, Kafka, Redis ve PostgreSQL üzerinden geçen isteklerin trace'lerini Jaeger ve Grafana üzerinde görselleştirir.
+`go-otel-kit` is an OpenTelemetry-based tracing utility library for Go applications. It provides reusable instrumentation for HTTP, gRPC, Kafka, Redis, and PostgreSQL, and integrates with Jaeger and Grafana for trace visualization.
 
 ---
 
-## 🚀 Observability Stack Setup
+## Overview
 
-Projeye yeni katılan biri için tam stack'i **tek komutla** ayağa kaldırma rehberi.  
-Aşağıdaki adımları izleyerek 10 dakika içinde çalışan bir observability ortamına sahip olabilirsin.
+This repository includes both the tracing library and example applications that demonstrate how to:
 
-### Gereksinimler
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) kurulu ve çalışıyor olmalı
-- [Go 1.21+](https://go.dev/dl/) kurulu olmalı (örnek servisleri çalıştırmak için)
-- Git ile repo klonlanmış olmalı
+- initialize an OpenTelemetry provider
+- instrument HTTP servers and clients
+- add gRPC interceptors
+- propagate trace context through Kafka
+- instrument Redis and GORM-backed PostgreSQL operations
 
 ---
 
-### 1. Stack'i Başlat
+## Requirements
+
+- Docker
+- Go 1.21+
+- Git
+
+---
+
+## Quick Start
+
+Start the full observability stack:
 
 ```bash
 docker compose -f docker-compose.full.yml up -d
 ```
 
-Bu komut aşağıdaki servisleri tek seferde ayağa kaldırır:
-
-| Servis         | Açıklama                                      |
-|----------------|-----------------------------------------------|
-| Jaeger         | Distributed trace görselleştirme              |
-| OTel Collector | Trace toplama ve yönlendirme                  |
-| Grafana        | Dashboard ve metrik görselleştirme            |
-| Kafka          | Asenkron mesajlaşma altyapısı (KRaft modu)    |
-| PostgreSQL     | İlişkisel veritabanı                          |
-| Redis          | Cache                                         |
-
----
-
-### 2. Servislerin Durumunu Kontrol Et
+Check stack status:
 
 ```bash
 docker compose -f docker-compose.full.yml ps
 ```
 
-Tüm servisler `Up` durumunda görünmelidir.
-
----
-
-### 3. Port Listesi
-
-| Servis         | Port  | Açıklama                          |
-|----------------|-------|-----------------------------------|
-| Jaeger UI      | 16686 | Trace görselleştirme arayüzü      |
-| OTel Collector | 4317  | OTLP gRPC uygulama bağlantı noktası |
-| OTel Collector | 4318  | OTLP HTTP uygulama bağlantı noktası |
-| OTel Collector | 8888  | Collector kendi metrikleri        |
-| Grafana        | 3000  | Dashboard arayüzü                 |
-| Kafka          | 9092  | Kafka broker                      |
-| PostgreSQL     | 5432  | Veritabanı                        |
-| Redis          | 6379  | Cache                             |
-
----
-
-### 4. Arayüzlere Erişim
-
-**Jaeger** → http://localhost:16686  
-Kullanıcı adı veya şifre gerekmez.
-
-**Grafana** → http://localhost:3000  
-Kullanıcı: `admin` / Şifre: `admin`
-
----
-
-### 5. İlk Trace'i Görmek
-
-Stack çalışırken örnek HTTP servisini başlat:
-
-```bash
-cd examples/http
-go run main.go
-```
-
-Yeni bir terminalde test isteği at:
-
-```bash
-curl http://localhost:8080/hello
-```
-
-**Jaeger'da trace'i incele:**
-
-1. http://localhost:16686 adresini aç
-2. Sol menüden **Service:** `example-http-service` seç
-3. **Find Traces** butonuna tıkla
-4. Listelenen trace'e tıkla → HTTP span zincirini göreceksin
-
----
-
-### 6. Stack'i Durdurma
+Stop the stack:
 
 ```bash
 docker compose -f docker-compose.full.yml down
@@ -106,9 +48,50 @@ docker compose -f docker-compose.full.yml down
 
 ---
 
-## 🔧 Backend Integration Guide
+## Ports
 
-This library provides ready-to-use tools that make it easy to set up observability (tracing) in your microservice architectures (HTTP, gRPC, Kafka).
+| Service         | Port  | Description                          |
+|----------------|-------|--------------------------------------|
+| Jaeger UI      | 16686 | Trace visualization UI               |
+| OTel Collector | 4317  | OTLP gRPC endpoint                   |
+| OTel Collector | 4318  | OTLP HTTP endpoint                   |
+| OTel Collector | 8888  | Collector internal metrics           |
+| Grafana        | 3000  | Dashboard UI                         |
+| Kafka          | 9092  | Kafka broker                         |
+| PostgreSQL     | 5432  | Database                             |
+| Redis          | 6379  | Cache                                |
+
+---
+
+## User Interfaces
+
+- Jaeger: http://localhost:16686
+- Grafana: http://localhost:3000
+  - Username: `admin`
+  - Password: `admin`
+
+---
+
+## Example HTTP Trace
+
+Run the example HTTP service:
+
+```bash
+cd examples/http
+go run main.go
+```
+
+Send a request:
+
+```bash
+curl http://localhost:8080/hello
+```
+
+Open Jaeger and select the service `example-http-service` to inspect traces.
+
+---
+
+## Backend Integration Guide
 
 ### Installation
 
@@ -116,7 +99,7 @@ This library provides ready-to-use tools that make it easy to set up observabili
 go get github.com/Chimera-State/go-otel-kit
 ```
 
-### Provider Initialization
+### Initialize the Tracer Provider
 
 ```go
 package main
@@ -138,9 +121,11 @@ func main() {
 		setup.WithSamplingRate(1.0),
 	)
 	if err != nil {
-		log.Fatalf("Failed to initialize Tracer: %v", err)
+		log.Fatalf("failed to initialize tracer: %v", err)
 	}
 	defer setup.Shutdown(ctx)
+
+	// Application logic
 }
 ```
 
@@ -159,7 +144,7 @@ grpcServer := grpc.NewServer(
 )
 ```
 
-### Kafka Inject & Extract
+### Kafka Trace Propagation
 
 ```go
 // PRODUCER
@@ -179,13 +164,15 @@ func ConsumeEvent(client *kgo.Client) {
 		extractedCtx := kafka.ExtractFromRecord(ctx, record)
 		tracer := otel.Tracer("kafka-consumer")
 		_, span := tracer.Start(extractedCtx, "process-order-event")
-		// business logic...
+
+		// business logic
+
 		span.End()
 	}
 }
 ```
 
-### PostgreSQL (GORM) & Redis
+### Redis and PostgreSQL (GORM)
 
 ```go
 // Redis
@@ -197,7 +184,9 @@ db.Use(tracing.NewPlugin())
 
 ---
 
-## 📊 Benchmark: Tracing Overhead
+## Benchmark: Tracing Overhead
+
+The following values show example latency differences when tracing is enabled.
 
 | Operation      | Tracing Off | Tracing On | Overhead    |
 |----------------|-------------|------------|-------------|
@@ -207,20 +196,21 @@ db.Use(tracing.NewPlugin())
 
 ---
 
-## 📁 Proje Yapısı
+## Project Structure
 
 ```
 go-otel-kit/
-├── docker-compose.yml          # Geliştirme ortamı (temel servisler)
-├── docker-compose.full.yml     # Tam observability stack (tek komutla başlatılır)
-├── otel-collector-config.yml   # OTel Collector pipeline konfigürasyonu
-├── setup/                      # TracerProvider başlatma ve kapatma
-├── middleware/                 # HTTP trace middleware
-├── interceptor/                # gRPC trace interceptor
-├── kafka/                      # Kafka producer/consumer trace wrapper
-├── grafana/                    # Grafana dashboard ve provisioning dosyaları
-└── examples/                   # Çalıştırılabilir örnek uygulamalar
-    ├── http/                   # HTTP trace örneği
-    ├── grpc/                   # gRPC trace örneği
-    └── redis-pg/               # Redis + PostgreSQL trace örneği
+├── docker-compose.yml          # Development environment
+├── docker-compose.full.yml     # Full observability stack
+├── otel-collector-config.yml   # OTel Collector pipeline configuration
+├── setup/                      # TracerProvider initialization and shutdown
+├── middleware/                 # HTTP tracing middleware
+├── interceptor/                 # gRPC tracing interceptor
+├── kafka/                      # Kafka trace propagation helpers
+├── grafana/                    # Grafana dashboards and provisioning files
+└── examples/                   # Example applications
+	├── http/                   # HTTP example
+	├── grpc/                   # gRPC example
+	└── redis-pg/               # Redis + PostgreSQL example
 ```
+
