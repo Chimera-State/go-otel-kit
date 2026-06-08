@@ -91,6 +91,16 @@ Open Jaeger and select the service `example-http-service` to inspect traces.
 
 ---
 
+## Trace Visualizations
+
+Here are some real-world traces collected by `go-otel-kit` in the Jaeger UI:
+
+![Jaeger Gateway Trace](assets/jaeger-gatewaytrace.png)
+![Jaeger Gateway Overview](assets/jaeger-gateway.png)
+![Jaeger Backend Overview](assets/jaeger-backend.png)
+
+---
+
 ## Backend Integration Guide
 
 ### Installation
