@@ -91,6 +91,16 @@ Jaeger üzerinden `example-http-service` servisini seçerek trace verilerini inc
 
 ---
 
+## Trace Görselleştirmeleri
+
+Aşağıda `go-otel-kit` tarafından toplanan ve Jaeger arayüzünde görüntülenen gerçek dünya izleme (trace) örneklerini görebilirsiniz:
+
+![Jaeger Gateway Trace](assets/jaeger-gatewaytrace.png)
+![Jaeger Gateway Overview](assets/jaeger-gateway.png)
+![Jaeger Backend Overview](assets/jaeger-backend.png)
+
+---
+
 ## Entegrasyon Rehberi
 
 ### Kurulum
