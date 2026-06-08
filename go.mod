@@ -12,6 +12,11 @@ require (
 )
 
 require (
+	go.opentelemetry.io/otel/trace v1.43.0
+	google.golang.org/grpc v1.81.1
+)
+
+require (
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect

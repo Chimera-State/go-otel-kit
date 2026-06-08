@@ -25,7 +25,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to init tracing: %v", err)
 	}
-	defer setup.Shutdown(ctx)
+	defer func() {
+		if err := setup.Shutdown(ctx); err != nil {
+			log.Printf("failed to shutdown tracing: %v", err)
+		}
+	}()
 
 	helloHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		clientReq, _ := http.NewRequestWithContext(r.Context(), "GET", "http://localhost:8080/world", nil)
@@ -43,13 +47,13 @@ func main() {
 
 		body, _ := io.ReadAll(resp.Body)
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(fmt.Sprintf("Hello endpoint called another endpoint and received: %s", body)))
+		_, _ = w.Write([]byte(fmt.Sprintf("Hello endpoint called another endpoint and received: %s", body)))
 	})
 
 	worldHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(50 * time.Millisecond)
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("World!"))
+		_, _ = w.Write([]byte("World!"))
 	})
 
 	http.Handle("/hello", middleware.TraceMiddleware(helloHandler))

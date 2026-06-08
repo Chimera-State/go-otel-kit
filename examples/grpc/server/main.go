@@ -1,4 +1,4 @@
-package grpc
+package main
 
 import (
 	"context"
@@ -18,7 +18,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to init tracing: %v", err)
 	}
-	defer setup.Shutdown(ctx)
+	defer func() {
+		if err := setup.Shutdown(ctx); err != nil {
+			log.Printf("failed to shutdown tracing: %v", err)
+		}
+	}()
 
 	// gRPC serveri oluştur
 	server := grpc.NewServer(interceptor.ServerOptions()...)
