@@ -1,33 +1,25 @@
 {
-  "__inputs": [],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "10.0.0"
-    },
-    {
-      "type": "datasource",
-      "id": "jaeger",
-      "name": "Jaeger",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "nodeGraph",
-      "name": "Node Graph",
-      "version": ""
-    }
-  ],
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "description": "Servisler arası bağımlılıkları ve trace akışını görselleştirir.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -36,60 +28,6 @@
         "uid": "jaeger-datasource"
       },
       "description": "Servisler arası çağrı bağımlılıklarını gösterir. Node boyutu istek hacmini, renk ise hata oranını temsil eder.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "arc__errors"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "displayName",
-                "value": "Error Rate"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "arc__success"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "displayName",
-                "value": "Success Rate"
-              }
-            ]
-          }
-        ]
-      },
       "gridPos": {
         "h": 20,
         "w": 24,
@@ -98,33 +36,47 @@
       },
       "id": 1,
       "options": {
-        "nodes": {
-          "mainStatUnit": "ms",
-          "secondaryStatUnit": "reqps"
-        }
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
       },
-      "title": "Service Map — Servis Bağımlılık Grafiği",
-      "type": "nodeGraph",
       "targets": [
         {
           "datasource": {
             "type": "jaeger",
             "uid": "jaeger-datasource"
           },
-          "queryType": "serviceMap",
+          "limit": 20,
+          "operation": "all",
+          "queryType": "search",
           "refId": "A",
           "service": "$service"
         }
-      ]
+      ],
+      "title": "Service Map — Trace Listesi",
+      "type": "traces"
     }
   ],
   "refresh": "30s",
-  "schemaVersion": 38,
-  "tags": ["otel", "tracing", "service-map"],
+  "schemaVersion": 39,
+  "tags": [
+    "otel",
+    "tracing",
+    "service-map"
+  ],
   "templating": {
     "list": [
       {
-        "current": {},
+        "current": {
+          "selected": false,
+          "text": "example-http-service",
+          "value": "example-http-service"
+        },
         "datasource": {
           "type": "jaeger",
           "uid": "jaeger-datasource"
@@ -135,15 +87,34 @@
         "label": "Service",
         "multi": false,
         "name": "service",
-        "options": [],
-        "query": {
-          "queryType": "services",
-          "refId": "StandardVariableQuery"
-        },
+        "options": [
+          {
+            "selected": false,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": true,
+            "text": "example-http-service",
+            "value": "example-http-service"
+          },
+          {
+            "selected": false,
+            "text": "example-grpc-server",
+            "value": "example-grpc-server"
+          },
+          {
+            "selected": false,
+            "text": "example-grpc-client",
+            "value": "example-grpc-client"
+          }
+        ],
+        "query": "example-http-service,example-grpc-server,example-grpc-client",
         "refresh": 2,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
-        "type": "query"
+        "type": "custom"
       }
     ]
   },
@@ -155,5 +126,6 @@
   "timezone": "browser",
   "title": "Service Map",
   "uid": "service-map-dashboard",
-  "version": 1
+  "version": 1,
+  "weekStart": ""
 }
